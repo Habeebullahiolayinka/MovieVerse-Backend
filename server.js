@@ -11,12 +11,14 @@ dotenv.config();
 
 const app = express()
 
-app.use(helmet())
+app.use(helmet());
 
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.CLIENT_URL,
-    Credential: true
-}))
+    credentials: true,
+  })
+);
 
 
 app.use(express.json())
