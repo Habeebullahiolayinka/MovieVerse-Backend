@@ -1,12 +1,25 @@
+
 import mongoose from "mongoose";
 
-export const connectDB = async()=>{
-    try {
-        await mongoose.connect(process.env.MONGO_URI)
-        console.log("MongoDB Connected Successfully")
-    } catch (error) {
-        console.error("MongoDB connenction failed:", error.message)
-        process.exit(1)
-    }
-}
+let connectionPromise;
 
+export const connectDB = async () => {
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI is not defined");
+  }
+
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (!connectionPromise) {
+    connectionPromise = mongoose
+      .connect(process.env.MONGO_URI)
+      .catch((error) => {
+        connectionPromise = undefined;
+        throw error;
+      });
+  }
+
+  return connectionPromise;
+};
